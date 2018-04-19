@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 //#ssh -L 6379:localhost:6379 zhanglei@zhanghuanrong.southcentralus.cloudapp.azure.com
 
@@ -7,12 +7,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
-var redis=require('redis').createClient();
-
-redis.on("error", function(err) {
-    console.error('Redis client error:', err);
-});
+var hbs = require('hbs')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -32,23 +27,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
+var db = require("./stk.js");
+
+db.getIdAndNames(db);
+
 app.get('/list/:query?', function(req, res) {
-  redis.hgetall("_stockId2Name", function(err,idNames) {
-      if (req.params.query) {
-          var query = req.params.query;
-          var filteredIdNames = {};
-          for (var key in idNames) {
-              var value = idNames[key];
-              if (value && (key.includes(query) || value.includes(query))) {
-                  filteredIdNames[key] = value;
-              }
-          }
-      }
-      else {
-          var filteredIdNames = idNames;
-      }
-      res.send(filteredIdNames);
-  });
+  var idNames = db._idNames;
+  if (req.params.query) {
+        var query = req.params.query;
+        var filteredIdNames = {};
+        for (var key in idNames) {
+            var value = idNames[key];
+            if (value && (key.includes(query) || value.includes(query))) {
+                filteredIdNames[key] = value;
+            }
+        }
+    }
+    else {
+        var filteredIdNames = idNames;
+    }
+    res.render('list', { idNames: filteredIdNames});
 });
 
 app.get('/history/:id', function(req, res) {
