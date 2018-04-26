@@ -7,6 +7,7 @@ redis.on("error", function(err) {
 });
 
 exports._idNames = {};
+exports._idHistories = {};
 
 exports.getIdAndNames = function (db) {
     redis.hgetall("_stockId2Name", function(err, idNames) {
@@ -17,3 +18,18 @@ exports.getIdAndNames = function (db) {
         }
     });
 };
+
+function historySearchHandler(info) {
+    return info;
+}
+
+exports.getHistories = function (db) {
+    var keys = ['sz002669', 'sh601669', 'sz000669'];
+    keys.forEach(function (stockId) {
+        redis.get(stockId, function (err, reply) {
+            var evo = eval(reply);
+            db._idHistories[stockId] = evo[0].hq;
+            console.log(stockId, " ==> ", db._idHistories[stockId][0].join(','));
+        });
+    });
+}

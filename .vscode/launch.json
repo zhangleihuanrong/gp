@@ -7,6 +7,9 @@
         {
             "type": "node",
             "request": "launch",
+            "env": {
+                "PORT" : "3000"
+            },
             "name": "Launch Program",
             "program": "${workspaceFolder}/bin/www"
         }

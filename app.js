@@ -31,26 +31,28 @@ var db = require("./stk.js");
 
 db.getIdAndNames(db);
 
-app.get('/list/:query?', function(req, res) {
-  var idNames = db._idNames;
-  if (req.params.query) {
-        var query = req.params.query;
-        var filteredIdNames = {};
-        for (var key in idNames) {
-            var value = idNames[key];
-            if (value && (key.includes(query) || value.includes(query))) {
-                filteredIdNames[key] = value;
+db.getHistories(db);
+
+app.get('/list', function(req, res) {
+    var q = req.query.q || '';
+    var histories = db._idHistories;
+    if (q) {
+        var idNames = {};
+        for (var key in db._idNames) {
+            var value = db._idNames[key];
+            if (value && (key.includes(q) || value.includes(q))) {
+                idNames[key] = value;
             }
         }
     }
     else {
-        var filteredIdNames = idNames;
+        var idNames = db._idNames;
     }
-    res.render('list', { idNames: filteredIdNames});
+    res.render('list', {  q : q, idNames: idNames, histories: histories, title: "Look look..."});
 });
 
-app.get('/history/:id', function(req, res) {
-  res.send('id=' + req.params.id);
+app.get('/history', function(req, res) {
+  res.render('history' + req.query.id);
 });
 
 // catch 404 and forward to error handler

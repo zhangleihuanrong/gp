@@ -1,6 +1,21 @@
-<h1>List All</h1>
+<form action="/list" method="GET">
+  <label for="SearchHint">Search for:</label>
+  <input id="q" type="text" name="q" value="{{q}}"/>
+  <input type="submit" value="Search"/>
+</form>
+<h1>{{title}}</h1>
 <div>
-    {{#each idNames}}
-        <br/><a href="/history/{{@key}}">{{@key}}. {{this}}</a>
-    {{/each}}
+    <table>
+        <tbody>
+            {{#each idNames}}
+                <tr>
+                    <td><a href="/history?id={{@key}}">{{@key}}</a></td>
+                    <td><a href="/history?id={{@key}}">{{this}}</a></td>
+                    {{#each ../histories.[@key]}}
+                        <td>{{this}}</td>
+                    {{/each}}
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
 </div>
