@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable({{{history}}}, true);
+
+        var options = {
+          legend: 'none',
+          bar: { groupWidth: '90%' }, // Remove space between bars.
+          candlestick: {
+            fallingColor: { strokeWidth: 1, stroke: '#0f9d58', fill: '#0f9d58' }, // green
+            risingColor: { strokeWidth: 1, stroke: '#a52714', fill: '#a52714' }   // red
+          }
+        };
+
+        var chart = new google.visualization.CandlestickChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <div>{{name}}({{id}})
+        <a href="/history?id={{id}}&win=30">30days</a> 
+        <a href="/history?id={{id}}&win=60">60days</a> 
+        <a href="/history?id={{id}}&win=120">120days</a> 
+        <a href="/history?id={{id}}&win=300">300days</a> 
+        <a href="/history?id={{id}}&win=0">all</a></div>
+    <div id="chart_div" style="width: 1300px; height: 600px;"></div>
+  </body>
+</html>

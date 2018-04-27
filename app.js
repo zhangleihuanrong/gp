@@ -31,7 +31,7 @@ var db = require("./stk.js");
 
 db.getIdAndNames(db);
 
-db.getHistories(db);
+//db.getHistories(db);
 
 app.get('/list', function(req, res) {
     var q = req.query.q || '';
@@ -54,13 +54,20 @@ app.get('/list', function(req, res) {
 
 app.get('/history', function(req, res) {
     var id = req.query.id;
+    var win = 30;
+    if (req.query.win) {
+        win = req.query.win;
+    }
     if (id) {
         var name = db._idNames[id];
+        if (win <= 0) {
+            win = db._idHistories[id].length;
+        }
         var history = db._idHistories[id]
                     .map(x => [x[0], Number(x[5]), Number(x[1]), Number(x[2]), Number(x[6])])
-                    .slice(0, 60).reverse();
+                    .slice(0, win).reverse();
         var histJson = JSON.stringify(history);
-        res.render('history', {id : id, name: name, history : histJson});
+        res.render('history', {id : id, name: name, history : histJson, win: win});
     }
 });
 

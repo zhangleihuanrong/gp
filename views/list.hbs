@@ -35,8 +35,8 @@
         <tbody>
             {{#each idNames as |value key|}}
                 <tr>
-                    <td><a href="/history\?id={{key}}">{{key}}</a></td>
-                    <td><a href="/history\?id={{key}}">{{this}}</a></td>
+                    <td><a href="/history?id={{key}}">{{key}}</a></td>
+                    <td><a href="/history?id={{key}}">{{this}}</a></td>
                     {{#with (lookup (lookup ../histories key) 0) as |gphist|}}
                         {{#if gphist}}
                             <td>{{gphist.[2]}}</td>

@@ -1,5 +1,6 @@
 # build directory if any
 build/
+src/crawlgp/build/
 
 # Dependency directories
 node_modules/
