@@ -51,9 +51,19 @@ app.get('/list', function(req, res) {
     res.render('list', {  q : q, idNames: idNames, histories: histories, title: "Look look..."});
 });
 
+
 app.get('/history', function(req, res) {
-  res.render('history' + req.query.id);
+    var id = req.query.id;
+    if (id) {
+        var name = db._idNames[id];
+        var history = db._idHistories[id]
+                    .map(x => [x[0], Number(x[5]), Number(x[1]), Number(x[2]), Number(x[6])])
+                    .slice(0, 60).reverse();
+        var histJson = JSON.stringify(history);
+        res.render('history', {id : id, name: name, history : histJson});
+    }
 });
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
