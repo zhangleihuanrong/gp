@@ -33,6 +33,10 @@ db.getIdAndNames(db);
 
 //db.getHistories(db);
 
+var tableTitle = ["id", "Name", "Close", "%Chg", "Open", "Low", "Hight", "VOL(100 hand)", "AMOUNT(10K RMB)", "Turnover Rate"].map(
+        function(name) { var obj = new Object(); obj.title = name; return obj;} );
+var tableTitleStr = JSON.stringify(tableTitle);
+
 app.get('/list', function(req, res) {
     var q = req.query.q || '';
     var histories = db._idHistories;
@@ -48,7 +52,18 @@ app.get('/list', function(req, res) {
     else {
         var idNames = db._idNames;
     }
-    res.render('list', {  q : q, idNames: idNames, histories: histories, title: "Look look..."});
+    var tableData=[];
+    for (var gpid in idNames) {
+        if (histories[gpid] && histories[gpid][0]) {
+            var info = histories[gpid][0];
+            tableData.push([gpid, idNames[gpid], Number(info[2]), info[4], Number(info[1]), Number(info[5]), Number(info[6]), Number(info[7]), Number(info[8]), info[9]]);
+        }
+        else {
+            tableData.push([gpid, idNames[gpid], "", "", "", "", "", "", "", ""]);
+        }
+    }
+    var tableDataStr = JSON.stringify(tableData);
+    res.render('list', {  q : q, tableTitle: tableTitleStr, tableData: tableDataStr, title: "Look look..."});
 });
 
 

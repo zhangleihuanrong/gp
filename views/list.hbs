@@ -1,65 +1,39 @@
-<form action="/list" method="GET">
-  <label for="SearchHint">Search for:</label>
-  <input id="q" type="text" name="q" value="{{q}}"/>
-  <input type="submit" value="Search"/>
-</form>
-<h1>{{title}}</h1>
-<div>
-    <table>
-        <thead>
-            <tr>
-                <td>Id</td>
-                <td>Name</td>
-                <td>Close</td>
-                <td>%Chg</td>
-                <td>Open</td>
-                <td>Low</td>
-                <td>High</td>
-                <td>VOL(*100)</td>
-                <td>AMOUNT(*10K)</td>
-                <td>Turnover Rate</td>
-                {{!-- Original sequence
-                <td>date</td>
-                <td>Open</td>
-                <td>Close</td>
-                <td>Change</td>
-                <td>%Chg</td>
-                <td>Low</td>
-                <td>High</td>
-                <td>VOL(*100)</td>
-                <td>AMOUNT(*10K)</td>
-                <td>Turnover Rate</td>
-                --}}
-            </tr>
-        </thead>
-        <tbody>
-            {{#each idNames as |value key|}}
-                <tr>
-                    <td><a href="/history?id={{key}}">{{key}}</a></td>
-                    <td><a href="/history?id={{key}}">{{this}}</a></td>
-                    {{#with (lookup (lookup ../histories key) 0) as |gphist|}}
-                        {{#if gphist}}
-                            <td>{{gphist.[2]}}</td>
-                            <td>{{gphist.[4]}}</td>
-                            <td>{{gphist.[1]}}</td>
-                            <td>{{gphist.[5]}}</td>
-                            <td>{{gphist.[6]}}</td>
-                            <td>{{gphist.[7]}}</td>
-                            <td>{{gphist.[8]}}</td>
-                            <td>{{gphist.[9]}}</td>
-                        {{else}}
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        {{/if}}
-                    {{/with}}
-                </tr>
-            {{/each}}
-        </tbody>
-    </table>
-</div>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        var tableData = {{{tableData}}};
+        var tableTitle = {{{tableTitle}}};
+        $(document).ready(function() {
+            $('#gplist').DataTable( {
+                "data": tableData,
+                "columns": tableTitle,
+                "columnDefs": [
+                        { 
+                            "render": function (data, type, row) {
+                                return `<a href="/history?id=${data}">${data}</a>`;
+                            },
+                            "targets": 0
+                        }
+                    ],
+                "lengthMenu": [[16, 68, 168, -1], [16, 68, 168, "All"]],
+                "pageLength": 68
+            } );
+        } );
+    </script>
+  </head>
+  <body>
+    <form action="/list" method="GET">
+    <label for="SearchHint">Search for:</label>
+    <input id="q" type="text" name="q" value="{{q}}"/>
+    <input type="submit" value="Search"/>
+    </form>
+    
+    <h1>{{title}}</h1>
+    
+    <table id="gplist" class="display" width="100%"></table>
+  </body>
+</html>
+    
