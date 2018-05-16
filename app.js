@@ -33,8 +33,9 @@ db.getIdAndNames(db);
 
 //db.getHistories(db);
 
-var tableTitle = ["id", "Name", "Close", "%Chg", "Open", "Low", "Hight", "VOL(100 hand)", "AMOUNT(10K RMB)", "Turnover Rate"].map(
-        function(name) { var obj = new Object(); obj.title = name; return obj;} );
+var tableTitle = ["id", "Name", "Close", "%Chg", "Open", "Low", "Hight", "VOL(Hands)", "AMOUNT(￥10K)", "%Turnover"].map(
+        function(name) { var obj = new Object(); obj.title = name; return obj;} 
+    );
 var tableTitleStr = JSON.stringify(tableTitle);
 
 app.get('/list', function(req, res) {
