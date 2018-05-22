@@ -8,7 +8,8 @@
             "type": "node",
             "request": "launch",
             "env": {
-                "PORT" : "3000"
+                "PORT" : "3000",
+                "DEBUG" : "gp:gp"
             },
             "name": "Launch Program",
             "program": "${workspaceFolder}/bin/www"

@@ -13,7 +13,7 @@
                 "columnDefs": [
                         { 
                             "render": function (data, type, row) {
-                                return `<a href="/history?id=${data}">${data}</a>`;
+                                return `<a href="history?id=${data}">${data}</a>`;
                             },
                             "targets": 0
                         }
@@ -25,7 +25,7 @@
     </script>
   </head>
   <body>
-    <form action="/list" method="GET">
+    <form action="list" method="GET">
     <label for="SearchHint">Search for:</label>
     <input id="q" type="text" name="q" value="{{q}}"/>
     <input type="submit" value="Search"/>
