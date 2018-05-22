@@ -2,11 +2,13 @@
 
 //#ssh -L 6379:localhost:6379 zhanglei@zhanghuanrong.southcentralus.cloudapp.azure.com
 
-const config=require('config');
+const debug = require('debug')('gp:app');
+debug(`++++Running js script ${__filename}...`);
 
+const path = require('path');
+const config=require('config');
 const createError = require('http-errors');
 const express = require('express');
-const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const hbs = require('hbs')

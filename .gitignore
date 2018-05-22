@@ -16,6 +16,8 @@ package-lock.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
+#cms contents
+cms/
 
 # Logs
 logs/

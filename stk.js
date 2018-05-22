@@ -57,7 +57,7 @@ function getIdAndNames() {
     });
 };
 
-getIdAndNames();
+//getIdAndNames();
 
 exports._idNames = _idNames;
 exports._idHistories = _idHistories;

@@ -9,7 +9,7 @@
             "request": "launch",
             "env": {
                 "PORT" : "3000",
-                "DEBUG" : "gp:gp"
+                "DEBUG" : "gp:*"
             },
             "name": "Launch Program",
             "program": "${workspaceFolder}/bin/www"

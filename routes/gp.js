@@ -1,7 +1,11 @@
+"use strict";
+
+const debug=require('debug')('gp:gp');
+debug(`++++Running js script ${__filename}...`);
+
 const express=require('express');
 const db = require("../stk.js");
 
-const debug=require('debug')('gp:gp');
 const router=express.Router();
 
 const moduleName='gp';

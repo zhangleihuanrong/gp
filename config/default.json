@@ -1,9 +1,0 @@
-{
-  "authentication" : {
-    "bcrypt" : {
-      "saltRound" : 10,
-      "secretKey": "abcdefghijklmn123456"
-    }
-  }
-}
-

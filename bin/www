@@ -4,22 +4,25 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('gp:server');
-var http = require('http');
+const debug = require('debug')('gp:server');
+debug(`++++Running js script ${__filename}...`);
+
+const config=require('config');
+const app = require('../app');
+const http = require('http');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3186');
+const port = normalizePort(process.env.PORT || config['server.PORT'] || '3000');
 app.set('port', port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+const server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
