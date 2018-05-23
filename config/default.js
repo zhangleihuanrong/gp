@@ -3,6 +3,7 @@
 const debug = require('debug')('gp:config');
 debug(`++++Running default configurations @${__filename}...`);
 
+const defer = require('config/defer').deferConfig;
 const path = require('path');
 const fs = require('fs');
 
@@ -12,7 +13,13 @@ const saltRound = 10;
 
 const keytar = require('keytar');
 const bcrypt = require('bcrypt');
-//const defer = require('config/defer').deferConfig;
+
+function KeyVault(kvs) {
+  this.keyValues = kvs;
+  this.getPassword = function(service, account) {
+    return Promise.resolve(this.keyValues[service][account]);
+  }
+}
 
 // function getPassword(service, account) will be added to this object
 let keyVault = null;
@@ -33,23 +40,24 @@ else if (secretKeyLocation == 'file') {
   assert(bcrypt.compareSync(secret, conf.validateHash) === true, "Secret is not matching with recorded hash!");
 
   let encryptedConfigFile = process.env.ENCRYPTED_CONFIG_LOCATION;
-
   let encryptedContent = fs.readFileSync(encryptedConfigFile, "utf8");
   
   let decipher = crypto.createDecipher('aes-128-cbc', secret);
   let origin = decipher.update(encryptedContent, 'hex', 'utf8')
   origin += decipher.update.final('utf8');
   debug(origin);  // origin should be object { service: { account : password...}}
-  keyVault = eval(origin);
-  keyVault['getPassword'] = function(service, account) {
-    return this[service][account];
-  }
+  keyVault = new KeyVault(eval(origin));
 }
 
-function getDecryptedSecret(service, account)  {
-  let rawPassword = keytar.getPassword(applicationName, applicationUser);
+async function getDecryptedSecret(service, account) {
+  let rawPassword = await keyVault.getPassword(service, account);
+  debug(`   -got password for ${service} ${account}: [${rawPassword}]`);
   return rawPassword;
 }
+
+let adminPass = getDecryptedSecret(applicationName, 'admin');
+let testPass = getDecryptedSecret(applicationName, 'test');
+let writerPass = getDecryptedSecret(applicationName, 'writer');
 
 const defaultConfig = {
   application: { 
@@ -57,19 +65,20 @@ const defaultConfig = {
     user: applicationUser
   },
   initialUsers : [
-    {id: 'admin', password: getDecryptedSecret('gp', 'admin'), roles:['admin']}, 
-    {id: 'test', password: getDecryptedSecret('gp', 'test'), roles: ['test']},
-    {id: 'user1', password: getDecryptedSecret('gp', 'user1'), roles: ['writer']},
-    {id: 'user2', password: getDecryptedSecret('gp', 'user2'), roles: ['writer']},
+    {id: 'admin', password: adminPass, roles:['admin']}, 
+    {id: 'test', password: testPass, roles: ['test']},
+    {id: 'writer', password: writerPass, roles: ['writer']},
     {id: 'guest', password: 'guest', roles: ['guest']},
   ],
   authentication : {
     bcrypt : { saltRound }
   },
   cms : {
-    docRoot : path.resolve(__dirname, "../cms/docs"),
-    imgRoot : path.resolve(__dirname, "../cms/images"),
-    videoRoot : path.resolve(__dirname, "../cms/videos"),
+    rootDirs: {
+      docs : path.resolve(__dirname, "../cms/docs"),
+      images : path.resolve(__dirname, "../cms/images"),
+      videos : path.resolve(__dirname, "../cms/videos"),
+    }
   },
   server : {
     PORT : 3000
@@ -79,11 +88,9 @@ const defaultConfig = {
   }
 };
 
-const cmsConfig = defaultConfig['cms'];
-const subContents = ['docRoot', 'imgRoot', 'videoRoot'];
-for (var i = 0; i < subContents.length; i++) {
-    const sc = subContents[i];
-    debug(`  --SubContentRoot for: ${sc} is  ${cmsConfig[sc]}`);
+const cmsConfig = defaultConfig['cms']['rootDirs'];
+for (let key in cmsConfig) {
+    debug(`  --SubContentRoot for: ${key} is  ${cmsConfig[key]}`);
 }
 
 module.exports=defaultConfig;

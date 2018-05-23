@@ -6,12 +6,16 @@ const debug = require('debug')('gp:app');
 debug(`++++Running js script ${__filename}...`);
 
 const path = require('path');
-const config=require('config');
+const config =require('config');
 const createError = require('http-errors');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const hbs = require('hbs')
+
+for (let i = 0; i < config.initialUsers.length; i++) {
+  debug(`  --User `, config.initialUsers[i]);
+}
 
 const app = express();
 
@@ -31,9 +35,11 @@ app.use('/', indexRouter);
 const gpRoute = require('./routes/gp');
 app.use('/gp/', gpRoute);
 
-// require('./routes/gp/list');
-// require('./routes/gp/history');
+const cmsRoute = require('./routes/cms');
+app.use('/cms/', cmsRoute);
 
+const apiRoute = require('./routes/api');
+app.use('/api/', apiRoute);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

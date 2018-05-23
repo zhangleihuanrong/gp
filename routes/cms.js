@@ -15,7 +15,14 @@ router.get('/', function (req, res, next) {
         res.redirect('docs');
     }
     else {
-        //ignore /gp such case
+        //ignore /cms without tailing /
         next('route');
     }
 });
+
+router.get('/docs', function (req, res, next) {
+    debug(`  ~~Sending redirect ${req.url}  ${req.originalUrl}`);
+    res.send("ok");
+});
+
+module.exports = router;
