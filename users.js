@@ -1,7 +1,8 @@
 'use strict';
 
-const assert=require('assert');
-const logger=require('winston');
+const assert = require('assert');
+const logger = require('winston');
+const config = require('config');
 
 const loki = require('lokijs');
 const LokiFSCipherAdapter = require('loki-fs-cipher-adapter');
@@ -9,8 +10,8 @@ const LokiFSCipherAdapter = require('loki-fs-cipher-adapter');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-const cryptPassword = 'lokipassword';
-const adapter= new LokiFSCipherAdapter({'password' : cryptPassword});
+const cryptPassword = config['loki.password'];
+const adapter= new LokiFSCipherAdapter({password : cryptPassword});
 const db = new loki('data/users.db', {
     autoload: true,
     autoloadCallback: dbInitialize,
@@ -51,7 +52,8 @@ function dbInitialize(err) {
     if (users === null) {
         logger.verbose("Initializing users database...");
         users = db.addCollection('users');
-        const startingUsers = [ {id: 'admin', password: 'abcd0987)(*&ABCD', roles:['admin']}, {id: 'test', password: 'test', roles: ['test']} ];
+        // [ {id: 'admin', password: 'abcd0987)(*&ABCD', roles:['admin']}, {id: 'test', password: 'test', roles: ['test']} ]...;
+        const startingUsers = config.initialUsers; 
         startingUsers.map(user => { addUser(user); });
         verbose.verbose("Added starting users to db...");
         db.save((err) => { 

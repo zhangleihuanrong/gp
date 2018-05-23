@@ -1,12 +1,9 @@
 'use strict';
 
-const bcrypt=require('bcrypt');
-const config=require('config');
+const bcrypt = require('bcrypt');
 
-var saltRound=config.get('authentication.bcrypt.saltRound');
-var bcryptSecret=config.get('authentication.bcrypt.secretKey');
-
-var rawPassword=process.argv[2];
+const rawPassword = process.argv[2];
+const saltRound = parseInt(process.argv[3]) || 10;
 
 var hash=bcrypt.hashSync(rawPassword, saltRound);
 
