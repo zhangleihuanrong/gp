@@ -13,6 +13,8 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const hbs = require('hbs')
 
+hbs.registerPartials(__dirname + '/views/partials');
+
 for (let i = 0; i < config.initialUsers.length; i++) {
   debug(`  --User `, config.initialUsers[i]);
 }
@@ -28,9 +30,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-const indexRouter = require('./routes/index');
-app.use('/', indexRouter);
-
 const gpRoute = require('./routes/gp');
 app.use('/gp/', gpRoute);
 
@@ -39,6 +38,9 @@ app.use('/cms/', cmsRoute);
 
 const apiRoute = require('./routes/api');
 app.use('/api/', apiRoute);
+
+const indexRouter = require('./routes/index');
+app.use('/', indexRouter);
 
 app.use(express.static(path.join(__dirname, 'public')));
 

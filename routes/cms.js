@@ -12,7 +12,7 @@ const moduleName='cms';
 router.get('/', function (req, res, next) {
     debug(`  ~~Sending redirect ${req.url}  ${req.originalUrl}`);
     if (req.originalUrl.endsWith("/")) {
-        res.redirect('docs');
+        res.redirect('docs/');
     }
     else {
         //ignore /cms without tailing /
@@ -20,9 +20,9 @@ router.get('/', function (req, res, next) {
     }
 });
 
-router.get('/docs', function (req, res, next) {
-    debug(`  ~~Sending redirect ${req.url}  ${req.originalUrl}`);
-    res.send("ok");
+router.get('/docs/*', function (req, res, next) {
+    debug(`  ~~Processing ${req.url}  ${req.originalUrl}`);
+    res.render("cms/docs");
 });
 
 module.exports = router;

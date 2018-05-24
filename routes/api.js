@@ -22,7 +22,7 @@ function getDirTree(source, parentId, result) {
         let name = children[i];
         let fullPath = join(source, name);
         if (isDirectory(fullPath)) {
-            let subdir = { id: `${parentId}/${name}`, text: name, children: []};
+            let subdir = { id: `${parentId}___${name}`, text: name, children: []};
             result.push(subdir);
             getDirTree(fullPath, subdir.id, subdir.children);
         }
@@ -36,7 +36,7 @@ function listFiles(source, parentId) {
         let name = children[i];
         let fullPath = join(source, name);
         if (isFile(fullPath)) {
-            let subFile = { id: `${parentId}/${name}`, text: name};
+            let subFile = { id: `${parentId}___${name}`, text: name};
             subFiles.push(subdir);
         }
     }
@@ -52,10 +52,10 @@ router.get('/tree/:module', function (req, res, next) {
     let moduleName = req.params['module'];
     if (!treeOfModules.hasOwnProperty(moduleName)) {
         const moduleRoot = config.get(`cms.rootDirs.${moduleName}`);
-        const rootNode = { id: moduleName, text: moduleName, children: [] };
-        getDirTree(moduleRoot, rootNode.id, rootNode.children);
-        treeOfModules[moduleName] = rootNode;
-        debug(rootNode);
+        const rootNodes = [{ id: moduleName, text: moduleName, children: []}];
+        getDirTree(moduleRoot, rootNodes[0].id, rootNodes[0].children);
+        treeOfModules[moduleName] = rootNodes;
+        debug(JSON.stringify(rootNodes));
     }
     const tree = treeOfModules[moduleName];
     res.send(tree);
