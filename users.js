@@ -1,5 +1,8 @@
 'use strict';
 
+const debug = require('debug')('gp:users');
+debug(`++++Running js script ${__filename}...`);
+
 const assert = require('assert');
 const logger = require('winston');
 const config = require('config');
@@ -11,6 +14,8 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 const cryptPassword = config['loki.password'];
+debug(`  --loki.password is ${cryptPassword}...`);
+
 const adapter= new LokiFSCipherAdapter({password : cryptPassword});
 const db = new loki('data/users.db', {
     autoload: true,
