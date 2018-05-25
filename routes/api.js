@@ -5,6 +5,8 @@ debug(`++++Running js script ${__filename}...`);
 
 const config=require('config');
 const express=require('express');
+
+
 const { lstatSync, readdirSync } = require('fs')
 const { join } = require('path')
 
@@ -16,28 +18,39 @@ function isFile(source) {
     return lstatSync(source).isFile();
 };
 
-function getDirTree(source, parentId, result) {
+// parentPath should be relative, starting from ""
+function getDirTree(moduleRoot, parentPath, result) {
+    let source = join(moduleRoot, parentPath);
     let children = readdirSync(source);
     for (let i in children) {
-        let name = children[i];
-        let fullPath = join(source, name);
+        let text = children[i];
+        let fullPath = join(source, text);
         if (isDirectory(fullPath)) {
-            let subdir = { id: `${parentId}___${name}`, text: name, children: []};
+            let relpath = join(parentPath, text);
+
+            // TODO: use better and faster hash function
+            const hasher = require('crypto').createHash('sha1');
+            hasher.update(relpath);
+            let id = hasher.digest('hex');
+
+            let subdir = { id, text, children: []};
             result.push(subdir);
-            getDirTree(fullPath, subdir.id, subdir.children);
+            getDirTree(moduleRoot, relpath, subdir.children);
         }
     }
 }
 
-function listFiles(source, parentId) {
-    const children = readdirSync(source);
+function listFiles(moduleRoot, relativePath) {
+    const fullPath = join(moduleRoot, relativePath);
+    const children = readdirSync(fullPath);
     const subFiles = [];
     for (let i in children) {
-        let name = children[i];
-        let fullPath = join(source, name);
-        if (isFile(fullPath)) {
-            let subFile = { id: `${parentId}___${name}`, text: name};
-            subFiles.push(subdir);
+        let childName = children[i];
+        let childFullPath = join(fullPath, childName);
+        let childRelative = join(relativePath, childName)
+        if (isFile(childFullPath)) {
+            let subFile = [ childName, childRelative ];
+            subFiles.push(subFile);
         }
     }
     return subFiles;
@@ -47,29 +60,40 @@ const moduleName='api';
 const treeOfModules = {};
 const router=express.Router();
 
-router.get('/tree/:module', function (req, res, next) {
-    debug(`  ~~Processing ${req.url}  ${req.originalUrl}`);
-    let moduleName = req.params['module'];
-    if (!treeOfModules.hasOwnProperty(moduleName)) {
-        const moduleRoot = config.get(`cms.rootDirs.${moduleName}`);
-        const rootNodes = [{ id: moduleName, text: moduleName, state: {opened: true}, children: []}];
-        getDirTree(moduleRoot, rootNodes[0].id, rootNodes[0].children);
-        treeOfModules[moduleName] = rootNodes;
-        debug(JSON.stringify(rootNodes));
-    }
-    const tree = treeOfModules[moduleName];
-    res.send(tree);
+router.get('*', function (req, res, next) {
+    debug(`  ~~API  ROUTE got ${req.url}  from ${req.originalUrl}`);
+    next();
 });
 
-router.get('/:module/*', function (req, res, next) {
-    debug(`  ~~Processing ${req.url}  ${req.originalUrl}`);
+router.get('/tree/:module(docs)', function (req, res, next) {
+    let moduleName = req.params['module'];
+    let refresh = req.query['refresh'] || false;
+    if (!treeOfModules.hasOwnProperty(moduleName) || refresh) {
+        const moduleRoot = config.get(`cms.rootDirs.${moduleName}`);
+        const rootNodes = [{ id: `cms_doc_root`, text: moduleName, state: {opened: true}, children: []}];
+        getDirTree(moduleRoot, '', rootNodes[0].children);
+        treeOfModules[moduleName] = rootNodes;
+    }
+    const tree = treeOfModules[moduleName];
+    debug(JSON.stringify(tree));
+    res.json(tree);
+    res.end();
+});
+
+router.get('/:module(docs)/*', function (req, res, next) {
     let moduleName = req.params['module'];
     const moduleRoot = config.get(`cms.rootDirs.${moduleName}`);
-    const subPath = req.url.substring(2 + moduleName.length);
-    const fullPath = join(moduleRoot, subPath);
-    const subFiles = listFiles(fullPath, subPath);
+    const relativePath = req.url.substring(2 + moduleName.length);
+    const fullPath = join(moduleRoot, relativePath);
+    const subFiles = listFiles(moduleRoot, relativePath);
     debug(subFiles);
-    res.send(subFiles); 
+    res.json(subFiles);
+    res.end();
+});
+
+router.get('*', function (req, res, next) {
+    debug(`  ~~API ROUTE did not handle ${req.url}  from ${req.originalUrl}`);
+    next();
 });
 
 module.exports = router;

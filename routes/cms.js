@@ -9,6 +9,11 @@ const router=express.Router();
 
 const moduleName='cms';
 
+router.get('*', function (req, res, next) {
+    debug(`  ~~CMS  ROUTE got ${req.url}  from ${req.originalUrl}`);
+    next();
+});
+
 router.get('/', function (req, res, next) {
     debug(`  ~~Sending redirect ${req.url}  ${req.originalUrl}`);
     if (req.originalUrl.endsWith("/")) {
@@ -23,6 +28,11 @@ router.get('/', function (req, res, next) {
 router.get('/docs/*', function (req, res, next) {
     debug(`  ~~Processing ${req.url}  ${req.originalUrl}`);
     res.render("cms/docs");
+});
+
+router.get('*', function (req, res, next) {
+    debug(`  ~~CMS  ROUTE did not handles ${req.url}  from ${req.originalUrl}`);
+    next();
 });
 
 module.exports = router;
