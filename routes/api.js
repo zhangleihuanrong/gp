@@ -52,7 +52,7 @@ router.get('/tree/:module', function (req, res, next) {
     let moduleName = req.params['module'];
     if (!treeOfModules.hasOwnProperty(moduleName)) {
         const moduleRoot = config.get(`cms.rootDirs.${moduleName}`);
-        const rootNodes = [{ id: moduleName, text: moduleName, children: []}];
+        const rootNodes = [{ id: moduleName, text: moduleName, state: {opened: true}, children: []}];
         getDirTree(moduleRoot, rootNodes[0].id, rootNodes[0].children);
         treeOfModules[moduleName] = rootNodes;
         debug(JSON.stringify(rootNodes));
