@@ -6,8 +6,10 @@ debug(`++++Running js script ${__filename}...`);
 const config=require('config');
 const express=require('express');
 
+const showdown  = require('showdown');
+const mdConverter = new showdown.Converter();
 
-const { lstatSync, readdirSync } = require('fs')
+const { lstatSync, readdirSync, readFile } = require('fs')
 const { join } = require('path')
 
 function isDirectory(source) {
@@ -85,10 +87,23 @@ router.get('/:module(docs)/*', function (req, res, next) {
     const moduleRoot = config.get(`cms.rootDirs.${moduleName}`);
     const relativePath = req.url.substring(2 + moduleName.length);
     const fullPath = join(moduleRoot, relativePath);
-    const subFiles = listFiles(moduleRoot, relativePath);
-    debug(subFiles);
-    res.json(subFiles);
-    res.end();
+    if (isDirectory(fullPath)) {
+        const subFiles = listFiles(moduleRoot, relativePath);
+        debug(subFiles);
+        res.json(subFiles);
+        res.end();
+    } else {
+        if (fullPath.endsWith('.md')) {
+            readFile(fullPath, 'utf8', (err, text) => {
+                //TODO: should do convert on client
+                const html = mdConverter.makeHtml(text);
+                res.send(html);
+            });
+        }
+        else {
+            next();
+        }
+    }
 });
 
 router.get('*', function (req, res, next) {
