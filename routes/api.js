@@ -6,8 +6,8 @@ debug(`++++Running js script ${__filename}...`);
 const config=require('config');
 const express=require('express');
 
-const showdown  = require('showdown');
-const mdConverter = new showdown.Converter();
+// const showdown  = require('showdown');
+// const mdConverter = new showdown.Converter();
 
 const { lstatSync, readdirSync, readFile } = require('fs')
 const { join } = require('path')
@@ -95,9 +95,9 @@ router.get('/:module(docs)/*', function (req, res, next) {
     } else {
         if (fullPath.endsWith('.md')) {
             readFile(fullPath, 'utf8', (err, text) => {
-                //TODO: should do convert on client
-                const html = mdConverter.makeHtml(text);
-                res.send(html);
+                // //TODO: should do convert on client
+                // const html = mdConverter.makeHtml(text);
+                res.send(text);
             });
         }
         else {
