@@ -46,10 +46,17 @@ app.use('/cms/', cmsRoute);
 const apiRoute = require('./routes/api');
 app.use('/api/', apiRoute);
 
+app.use('/stylesheets/', express.static(path.join(__dirname, 'public/stylesheets')));
+app.use('/images/', express.static(path.join(__dirname, 'public/images')));
+app.use('/scripts/', express.static(path.join(__dirname, 'public/scripts')));
+app.use('/fonts/', express.static(path.join(__dirname, 'public/fonts')));
+//app.use('/plugins/', express.static(path.join(__dirname, 'public/plugins')));
+app.use('/deps/', express.static(path.join(__dirname, 'public/deps')));
+app.use('/jstree/', express.static(path.join(__dirname, 'public/jstree')));
+app.use('/datatables/', express.static(path.join(__dirname, 'public/datatables')));
+
 const indexRouter = require('./routes/index');
 app.use('/', indexRouter);
-
-app.use(express.static(path.join(__dirname, 'public')));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
